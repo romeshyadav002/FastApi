@@ -1,0 +1,41 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# === Virtual Environment ===
+venv/
+.venv/
+
+# === macOS ===
+.DS_Store
+
+# === VSCode ===
+.vscode/
+
+# === Env Files ===
+.env
+.env.*
+
+# === Python Packaging ===
+*.egg
+*.egg-info/
+dist/
+build/
+
+# === Logs and Debugging ===
+*.log
+
+# === MyPy / Pyright / Type Checkers ===
+.mypy_cache/
+.pyright/
+
+# === Coverage ===
+.coverage
+htmlcov/
+.cache/
+
+# === Jupyter Notebooks (if using) ===
+.ipynb_checkpoints/
