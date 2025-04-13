@@ -1,9 +1,12 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, Query, UploadFile
 from pydantic import BaseModel
 from typing import List
 import numpy as np
 import pandas as pd
 import io
+from services.stats import get_csv_statistics
+from services.number_analysis import analyze_numbers
+from services.csv_filter import filter_csv_by_column
 
 
 app = FastAPI()
@@ -68,3 +71,24 @@ async def get_csv_stats(file: UploadFile = File(...)):
         "columns": df.columns.tolist(),
         "summary": summary
     }
+
+class NumbersInput(BaseModel):
+    numbers: list[float]
+
+@app.post("/analyze-numbers/")
+def analyze(numbers: NumbersInput):
+    return analyze_numbers(numbers.numbers)
+
+@app.post("/upload-csv/")
+async def upload_csv(file: UploadFile = File(...)):
+    content = await file.read()
+    return get_csv_statistics(content)
+
+@app.post("/filter-csv/")
+async def filter_csv(
+    file: UploadFile = File(...),
+    column: str = Query(...),
+    value: str = Query(...)
+):
+    content = await file.read()
+    return filter_csv_by_column(content, column, value)
