@@ -1,6 +1,9 @@
-from fastapi import FastAPI  
+from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
 from typing import List
+import numpy as np
+import pandas as pd
+import io
 
 
 app = FastAPI()
@@ -41,3 +44,27 @@ def delete_tea(tea_id: int):
             deleted = teas.pop(index)
             return deleted
     return {"error" : "Tea not found"}
+
+class NumbersList(BaseModel):
+    numbers: list[float]
+
+@app.post("/stats/")
+def get_numpy_stats(payload: NumbersList):
+    arr = np.array(payload.numbers)
+    return {
+        "sum": float(np.sum(arr)),
+        "mean": float(np.mean(arr)),
+        "std_dev": float(np.std(arr)),
+    }
+
+# --------- Upload CSV and get column stats ---------
+@app.post("/csv-stats/")
+async def get_csv_stats(file: UploadFile = File(...)):
+    content = await file.read()
+    df = pd.read_csv(io.BytesIO(content))
+    
+    summary = df.describe().to_dict()
+    return {
+        "columns": df.columns.tolist(),
+        "summary": summary
+    }
